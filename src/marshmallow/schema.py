@@ -591,7 +591,8 @@ class Schema(base.SchemaABC, metaclass=SchemaMeta):
         many: bool = False,
         partial=False,
         unknown=RAISE,
-        index=None
+        index=None,
+        postprocess=True
     ) -> typing.Union[_T, typing.List[_T]]:
         """Deserialize ``data``.
 
@@ -625,6 +626,7 @@ class Schema(base.SchemaABC, metaclass=SchemaMeta):
                             partial=partial,
                             unknown=unknown,
                             index=idx,
+                            postprocess=postprocess
                         ),
                     )
                     for idx, d in enumerate(data)
@@ -659,7 +661,7 @@ class Schema(base.SchemaABC, metaclass=SchemaMeta):
                 else:
                     d_kwargs["partial"] = partial
                 getter = lambda val: field_obj.deserialize(
-                    val, field_name, data, **d_kwargs
+                    val, field_name, data, postprocess=postprocess, **d_kwargs
                 )
                 value = self._call_and_store(
                     getter_func=getter,
@@ -853,6 +855,7 @@ class Schema(base.SchemaABC, metaclass=SchemaMeta):
                 many=many,
                 partial=partial,
                 unknown=unknown,
+                postprocess=postprocess,
             )
             # Run field-level validation
             self._invoke_field_validators(
